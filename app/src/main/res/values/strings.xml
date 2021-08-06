@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SNS</string>
+    <string name="str_sign_in">Sign In</string>
+    <string name="str_email">Email</string>
+    <string name="str_password">Password</string>
+    <string name="username">Username</string>
+    <string name="str_or">OR</string>
+    <string name="str_instacharm">Instacharm</string>
+    <string name="str_sign_up">Sign Up</string>
+</resources>
