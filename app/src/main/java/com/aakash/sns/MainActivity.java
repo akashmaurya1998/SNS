@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -17,12 +18,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 
@@ -36,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     private GoogleSignInClient mGoogleSignInClient;
     SignInButton googleSignInBtn;
-
+    private FirebaseDatabase database;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
 
         googleSignInBtn =  findViewById(R.id.google_button);
 
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference();
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null){
+            transitionToHomeActivity(user.getUid());
+            finish();
+        }
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions
@@ -109,7 +126,19 @@ public class MainActivity extends AppCompatActivity {
                                     .build();
 
                             user.updateProfile(changeRequest)
-                                    .addOnCompleteListener(task1 -> Toast.makeText(MainActivity.this, "Welcome" + username, Toast.LENGTH_SHORT).show());
+                                    .addOnCompleteListener(task1 -> {
+                                        Toast.makeText(MainActivity.this, "Welcome" + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                                        DatabaseReference ref = reference.child("users").push();
+                                        ref.child("UserName").setValue(user.getDisplayName()).addOnCompleteListener(task2 -> {
+                                            if (task2.isSuccessful()){
+                                                ref.child("userId").setValue(user.getUid());
+                                                transitionToHomeActivity(user.getUid());
+                                            } else {
+                                                Toast.makeText(MainActivity.this, task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    });
+
                         } else {
                             Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -140,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
+                            transitionToHomeActivity(user.getUid());
                             Toast.makeText(MainActivity.this, "Welcome " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -168,18 +198,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    User Login With Google
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
-                         user = mAuth.getCurrentUser();
-                        Toast.makeText(MainActivity.this, user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        user = mAuth.getCurrentUser();
+                        database.getReference().child("users").orderByChild("userId").equalTo(user.getUid()).limitToFirst(1).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (!snapshot.exists()) {
+                                   addUserData();
+                                }
+                                transitionToHomeActivity(user.getUid());
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     } else {
                         // If sign in fails, display a message to the user.
                         Toast.makeText(MainActivity.this, "Something went wrong!!", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+
+//    Adding User data to Database
+    private void addUserData() {
+        DatabaseReference ref = reference.child("users").push();
+        ref.child("UserName").setValue(user.getDisplayName());
+        ref.child("userId").setValue(user.getUid());
+    }
+
+
+//    Tarnsit to next Activity
+    private void transitionToHomeActivity(String uid){
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        intent.putExtra("USERID",uid);
+        startActivity(intent);
+        finish();
     }
 }
