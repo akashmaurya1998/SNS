@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     SignInButton googleSignInBtn;
     private FirebaseDatabase database;
     private DatabaseReference reference;
+    ProgressBar pbSignIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
 
         googleSignInBtn =  findViewById(R.id.google_button);
+
+        pbSignIn = findViewById(R.id.pbSignIn);
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
@@ -89,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         signInBtn.setOnClickListener(v -> signIn());
 
         googleSignInBtn.setOnClickListener(v -> {
+            pbSignIn.setVisibility(View.VISIBLE);
+
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
 
@@ -222,7 +229,8 @@ public class MainActivity extends AppCompatActivity {
                         });
                     } else {
                         // If sign in fails, display a message to the user.
-                        Toast.makeText(MainActivity.this, "Something went wrong!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        pbSignIn.setVisibility(View.INVISIBLE);
                     }
                 });
     }
