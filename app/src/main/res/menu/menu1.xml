@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:title="Logout"
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/str_logout"
         android:id="@+id/menu_Logout"
-        app:showAsAction="ifRoom"/>
+        android:contentDescription="@string/str_cd_logout_button"
+        />
+    <item android:title="@string/str_manage_profile"
+        android:id="@+id/menu_manageProfile"
+        android:contentDescription="@string/str_cd_manage_profile_button"
+        />
 </menu>

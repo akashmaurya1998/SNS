@@ -7,4 +7,8 @@
     <string name="str_or">OR</string>
     <string name="str_instacharm">Instacharm</string>
     <string name="str_sign_up">Sign Up</string>
+    <string name="str_logout">Logout</string>
+    <string name="str_manage_profile">Manage Profile</string>
+    <string name="str_cd_logout_button">LogoutButton</string>
+    <string name="str_cd_manage_profile_button">Manage Profile Button</string>
 </resources>
