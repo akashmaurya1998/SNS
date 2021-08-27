@@ -11,4 +11,11 @@
     <string name="str_manage_profile">Manage Profile</string>
     <string name="str_cd_logout_button">LogoutButton</string>
     <string name="str_cd_manage_profile_button">Manage Profile Button</string>
+    <string name="str_profile">Profile</string>
+    <string name="str_name">Name</string>
+    <string name="str_username">Username</string>
+    <string name="str_useremail">Email</string>
+    <string name="str_update">Update</string>
+    <string name="str_change">Make Changes</string>
+    <string name="str_save">SAVE</string>
 </resources>
