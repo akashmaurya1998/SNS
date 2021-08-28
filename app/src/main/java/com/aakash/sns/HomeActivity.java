@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,7 +55,6 @@ public class HomeActivity extends AppCompatActivity {
                 mAuth.signOut();
                 startActivity(new Intent(HomeActivity.this, MainActivity.class));
                 finish();
-                Toast.makeText(HomeActivity.this, "Logout", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.menu_manageProfile:
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));

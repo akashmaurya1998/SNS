@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (!snapshot.exists()) {
-                                   addUserData();
+                                   addUserData(user.getDisplayName(), user.getUid());
                                 }
                                 transitionToHomeActivity(user.getUid());
                             }
@@ -237,10 +237,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 //    Adding User data to Database
-    private void addUserData() {
+    private void addUserData(String displayName, String userId) {
         DatabaseReference ref = reference.child("users").push();
-        ref.child("UserName").setValue(user.getDisplayName());
-        ref.child("userId").setValue(user.getUid());
+        ref.child("UserName").setValue(displayName);
+        ref.child("userId").setValue(userId);
     }
 
 
